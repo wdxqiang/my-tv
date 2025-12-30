@@ -908,6 +908,11 @@ object TVList {
                 listNew[k] = group
             }
         }
+        // Add custom channels
+        val customChannels = SP.customSources
+        if (customChannels.isNotEmpty()) {
+            listNew["自定义"] = customChannels
+        }
         return listNew
     }
 }

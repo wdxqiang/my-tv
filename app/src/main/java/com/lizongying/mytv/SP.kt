@@ -2,6 +2,11 @@ package com.lizongying.mytv
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import java.lang.reflect.Type
+import com.lizongying.mytv.TV
+import com.lizongying.mytv.models.ProgramType
 
 object SP {
     // Name of the sp file TODO Should use a meaningful name and do migrations
@@ -25,6 +30,9 @@ object SP {
 
     // guid
     private const val KEY_GUID = "guid"
+    
+    // custom m3u sources
+    private const val KEY_CUSTOM_SOURCES = "custom_sources"
 
     private lateinit var sp: SharedPreferences
 
@@ -62,4 +70,21 @@ object SP {
     var guid: String
         get() = sp.getString(KEY_GUID, "") ?: ""
         set(value) = sp.edit().putString(KEY_GUID, value).apply()
+
+    private val gson = Gson()
+    private val customSourcesType: Type = object : TypeToken<MutableList<TV>>() {}.type
+    
+    var customSources: MutableList<TV>
+        get() {
+            val json = sp.getString(KEY_CUSTOM_SOURCES, null)
+            return if (json != null) {
+                gson.fromJson(json, customSourcesType)
+            } else {
+                mutableListOf()
+            }
+        }
+        set(value) {
+            val json = gson.toJson(value)
+            sp.edit().putString(KEY_CUSTOM_SOURCES, json).apply()
+        }
 }

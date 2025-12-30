@@ -82,6 +82,22 @@
                 android:layout_marginTop="5dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
+                
+            <Button
+                android:id="@+id/import_m3u"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="导入M3U直播源"
+                />
+                
+            <Button
+                android:id="@+id/manage_custom_channels"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="管理自定义频道"
+                />
         </LinearLayout>
         <ImageView
             android:layout_width="300dp"

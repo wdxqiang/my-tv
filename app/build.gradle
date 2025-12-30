@@ -80,7 +80,15 @@ static def VersionCode() {
         println("VersionCode $versionCode")
         return versionCode
     } catch (ignored) {
-        return 0
+        // Fallback to version.json if git describe fails
+        try {
+            def versionJson = file('../version.json').text
+            def versionMap = new groovy.json.JsonSlurper().parseText(versionJson)
+            return versionMap.version_code
+        } catch (e) {
+            // Default to 1 if all else fails
+            return 1
+        }
     }
 }
 
