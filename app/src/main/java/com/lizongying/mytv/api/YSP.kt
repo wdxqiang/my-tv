@@ -57,7 +57,9 @@ object YSP {
     private var encryptor = Encryptor()
 
     fun init(context: Context) {
-        encryptor.init(context)
+        if (Encryptor.isLibraryLoaded) {
+            encryptor.init(context)
+        }
         guid = getGuid()
     }
 
@@ -74,8 +76,11 @@ object YSP {
 
         timeStr = getTimeStr()
 
-        cKey =
+        cKey = if (Encryptor.isLibraryLoaded) {
             encryptor.encrypt(cnlid, timeStr, appVer, guid, platform)
+        } else {
+            "" // Return empty string if library is not loaded
+        }
         signature = getSignature()
         return """{"cnlid":"$cnlid","livepid":"$livepid","stream":"$stream","guid":"$guid","cKey":"$cKey","adjust":$adjust,"sphttps":"$sphttps","platform":"$platform","cmd":"$cmd","encryptVer":"$encryptVer","dtype":"$dtype","devid":"$devid","otype":"$otype","appVer":"$appVer","app_version":"$appVersion","rand_str":"$randStr","channel":"$channel","defn":"$defn","signature":"$signature"}"""
     }
@@ -129,6 +134,9 @@ object YSP {
     }
 
     private fun getSignature(): String {
+        if (!Encryptor.isLibraryLoaded) {
+            return ""
+        }
         val e =
             "adjust=${adjust}&appVer=${appVer}&app_version=$appVersion&cKey=$cKey&channel=$channel&cmd=$cmd&cnlid=$cnlid&defn=${defn}&devid=${devid}&dtype=${dtype}&encryptVer=${encryptVer}&guid=${guid}&livepid=${livepid}&otype=${otype}&platform=${platform}&rand_str=${randStr}&sphttps=${sphttps}&stream=${stream}".toByteArray()
         val hashedData = encryptor.hash(e) ?: return ""
@@ -136,6 +144,9 @@ object YSP {
     }
 
     private fun getAuthSignature(): String {
+        if (!Encryptor.isLibraryLoaded) {
+            return ""
+        }
         val e =
             "appid=${appid}&guid=${guid}&pid=${livepid}&rand_str=${randStr}".toByteArray()
         val hashedData = encryptor.hash2(e) ?: return ""
@@ -143,6 +154,9 @@ object YSP {
     }
 
     fun getAuthSignature(e: String): String {
+        if (!Encryptor.isLibraryLoaded) {
+            return ""
+        }
         val hashedData = encryptor.hash2(e.toByteArray()) ?: return ""
         return hashedData.let { it -> it.joinToString("") { "%02x".format(it) } }
     }

@@ -99,12 +99,16 @@ class PlayerFragment : Fragment(), SurfaceHolder.Callback {
     @OptIn(UnstableApi::class)
     fun play(tvViewModel: TVViewModel) {
         this.tvViewModel = tvViewModel
+        val videoUrl = tvViewModel.getVideoUrlCurrent()
+        Log.d(TAG, "Attempting to play video: $videoUrl")
         playerView?.player?.run {
-            setMediaItem(MediaItem.fromUri(tvViewModel.getVideoUrlCurrent()))
+            Log.d(TAG, "Using ExoPlayer for playback")
+            setMediaItem(MediaItem.fromUri(videoUrl))
             prepare()
         }
         exoPlayer?.run {
-            setMediaItem(com.google.android.exoplayer2.MediaItem.fromUri(tvViewModel.getVideoUrlCurrent()))
+            Log.d(TAG, "Using SimpleExoPlayer for playback")
+            setMediaItem(com.google.android.exoplayer2.MediaItem.fromUri(videoUrl))
             prepare()
         }
     }

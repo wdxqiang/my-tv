@@ -33,6 +33,8 @@ object SP {
     
     // custom m3u sources
     private const val KEY_CUSTOM_SOURCES = "custom_sources"
+    // custom m3u url
+    private const val KEY_CUSTOM_M3U_URL = "custom_m3u_url"
 
     private lateinit var sp: SharedPreferences
 
@@ -87,4 +89,8 @@ object SP {
             val json = gson.toJson(value)
             sp.edit().putString(KEY_CUSTOM_SOURCES, json).apply()
         }
+    
+    var customM3UUrl: String?
+        get() = sp.getString(KEY_CUSTOM_M3U_URL, null)
+        set(value) = sp.edit().putString(KEY_CUSTOM_M3U_URL, value).apply()
 }

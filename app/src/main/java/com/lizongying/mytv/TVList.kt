@@ -1,13 +1,58 @@
 package com.lizongying.mytv
 
+import android.util.Log
 import com.lizongying.mytv.models.ProgramType
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+
 object TVList {
+    private const val TAG = "TVList"
+    // User provided M3U play source URL
+    private const val USER_M3U_URL = "https://iptv-org.github.io/iptv/countries/cn.m3u"
+    
     val list: Map<String, List<TV>> by lazy {
         setup()
     }
 
     private fun setup(): Map<String, List<TV>> {
+        // Try to parse channels from custom M3U URL first (if set by user)
+        try {
+            val customM3UUrl = SP.customM3UUrl
+            if (!customM3UUrl.isNullOrEmpty()) {
+                // Use coroutine to perform network request in background thread
+                val userChannels = runBlocking(Dispatchers.IO) {
+                    M3UParser.parseM3UFromUrl(customM3UUrl)
+                }
+                if (userChannels.isNotEmpty()) {
+                    Log.d(TAG, "Successfully parsed ${userChannels.size} channels from custom M3U URL")
+                    return mapOf("用户频道" to userChannels)
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to parse custom M3U URL: ${e.message}")
+            e.printStackTrace()
+        }
+        
+        // Try to parse channels from default user provided M3U URL
+        try {
+            // Use coroutine to perform network request in background thread
+            val userChannels = runBlocking(Dispatchers.IO) {
+                M3UParser.parseM3UFromUrl(USER_M3U_URL)
+            }
+            if (userChannels.isNotEmpty()) {
+                Log.d(TAG, "Successfully parsed ${userChannels.size} channels from default user M3U URL")
+                return mapOf("用户频道" to userChannels)
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to parse default user M3U URL: ${e.message}")
+            e.printStackTrace()
+        }
+        
+        // Fallback to default channels if user M3U parsing fails
+        Log.d(TAG, "Using default channel list")
         var list = mapOf(
             "央视" to listOf(
                 TV(

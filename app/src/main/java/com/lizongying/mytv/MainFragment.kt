@@ -125,7 +125,7 @@ class MainFragment : BrowseSupportFragment() {
             }
         }
 
-        (activity as MainActivity).fragmentReady("MainFragment")
+        (activity as? MainActivity)?.fragmentReady("MainFragment")
     }
 
     fun toLastPosition() {
@@ -148,31 +148,33 @@ class MainFragment : BrowseSupportFragment() {
     private fun loadRows() {
         rowsAdapter = ArrayObjectAdapter(ListRowPresenter())
 
-        val cardPresenter = CardPresenter(context!!)
+        context?.let { ctx ->
+            val cardPresenter = CardPresenter(ctx)
 
-        var idx: Long = 0
-        for ((k, v) in TVList.list) {
-            val listRowAdapter = ArrayObjectAdapter(cardPresenter)
-            for ((idx2, v1) in v.withIndex()) {
-                val tvViewModel = TVViewModel(v1)
-                tvViewModel.setRowPosition(idx.toInt())
-                tvViewModel.setItemPosition(idx2)
-                tvListViewModel.addTVViewModel(tvViewModel)
-                listRowAdapter.add(tvViewModel)
+            var idx: Long = 0
+            for ((k, v) in TVList.list) {
+                val listRowAdapter = ArrayObjectAdapter(cardPresenter)
+                for ((idx2, v1) in v.withIndex()) {
+                    val tvViewModel = TVViewModel(v1)
+                    tvViewModel.setRowPosition(idx.toInt())
+                    tvViewModel.setItemPosition(idx2)
+                    tvListViewModel.addTVViewModel(tvViewModel)
+                    listRowAdapter.add(tvViewModel)
+                }
+                tvListViewModel.maxNum.add(v.size)
+                val header = HeaderItem(idx, k)
+                rowsAdapter?.add(ListRow(header, listRowAdapter))
+                idx++
             }
-            tvListViewModel.maxNum.add(v.size)
-            val header = HeaderItem(idx, k)
-            rowsAdapter!!.add(ListRow(header, listRowAdapter))
-            idx++
-        }
 
-        adapter = rowsAdapter
+            adapter = rowsAdapter
 
-        itemPosition = SP.itemPosition
-        if (itemPosition >= tvListViewModel.size()) {
-            itemPosition = 0
+            itemPosition = SP.itemPosition
+            if (itemPosition >= tvListViewModel.size()) {
+                itemPosition = 0
+            }
+            tvListViewModel.setItemPosition(itemPosition)
         }
-        tvListViewModel.setItemPosition(itemPosition)
     }
 
     fun prevSource() {
@@ -235,7 +237,7 @@ class MainFragment : BrowseSupportFragment() {
         ) {
             if (item is TVViewModel) {
                 tvListViewModel.setItemPositionCurrent(item.getTV().id)
-                (activity as MainActivity).mainActive()
+                (activity as? MainActivity)?.mainActive()
             }
         }
     }

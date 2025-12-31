@@ -12,8 +12,15 @@ class Encryptor {
     external fun hash2(data: ByteArray): ByteArray?
 
     companion object {
+        var isLibraryLoaded = false
         init {
-            System.loadLibrary("native")
+            try {
+                System.loadLibrary("native")
+                isLibraryLoaded = true
+            } catch (e: UnsatisfiedLinkError) {
+                // Library loading failed, but we'll handle this gracefully
+                isLibraryLoaded = false
+            }
         }
     }
 }

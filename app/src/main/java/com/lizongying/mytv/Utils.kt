@@ -35,7 +35,10 @@ object Utils {
         try {
             currentTimeMillis = getTimestampFromServer()
         } catch (e: Exception) {
-            println("Failed to retrieve timestamp from server: ${e.message}")
+            // Log error but don't crash the app
+            e.printStackTrace()
+            // Use local time if server time retrieval fails
+            currentTimeMillis = System.currentTimeMillis()
         }
         between = System.currentTimeMillis() - currentTimeMillis
     }
@@ -47,20 +50,33 @@ object Utils {
     private suspend fun getTimestampFromServer(): Long {
         return withContext(Dispatchers.IO) {
             val client = okhttp3.OkHttpClient.Builder()
-                .connectTimeout(500, java.util.concurrent.TimeUnit.MILLISECONDS)
-                .readTimeout(1, java.util.concurrent.TimeUnit.SECONDS).build()
+                .connectTimeout(1, java.util.concurrent.TimeUnit.SECONDS)
+                .readTimeout(2, java.util.concurrent.TimeUnit.SECONDS)
+                .build()
             val request = okhttp3.Request.Builder()
                 .url("https://api.m.taobao.com/rest/api3.do?api=mtop.common.getTimestamp")
                 .build()
             try {
                 client.newCall(request).execute().use { response ->
-                    if (!response.isSuccessful) throw IOException("Unexpected code $response")
-                    val string = response.body()?.string()
-                    Gson().fromJson(string, TimeResponse::class.java).data.t.toLong()
+                    if (!response.isSuccessful) {
+                        // If server returns error, use local time instead of throwing
+                        return@use System.currentTimeMillis()
+                    }
+                    val string = response.body()?.string() ?: ""
+                    if (string.isEmpty()) {
+                        return@use System.currentTimeMillis()
+                    }
+                    try {
+                        Gson().fromJson(string, TimeResponse::class.java).data.t.toLong()
+                    } catch (jsonEx: Exception) {
+                        // If JSON parsing fails, use local time
+                        System.currentTimeMillis()
+                    }
                 }
             } catch (e: IOException) {
-                // Handle network errors
-                throw IOException("Error during network request", e)
+                // Handle network errors gracefully
+                e.printStackTrace()
+                System.currentTimeMillis()
             }
         }
     }

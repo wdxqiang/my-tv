@@ -5,17 +5,14 @@
     android:layout_height="wrap_content"
     >
     <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
-        <LinearLayout
-            android:layout_width="300dp"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:paddingTop="20dp"
-            android:paddingLeft="7dp"
-            android:paddingRight="7dp"
-            android:background="#FF263238"
-            >
+        android:layout_width="400dp"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingTop="20dp"
+        android:paddingLeft="7dp"
+        android:paddingRight="7dp"
+        android:background="#FF263238"
+        >
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -83,12 +80,64 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
                 
-            <Button
-                android:id="@+id/import_m3u"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="10dp"
+                android:gravity="center_vertical"
+                >
+                <EditText
+                    android:id="@+id/input_m3u_url"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:hint="输入M3U播放源URL"
+                    android:inputType="textUri"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:padding="5dp"
+                    android:background="#FF37474F"
+                    android:textColor="#FFFFFF"
+                    android:layout_marginEnd="10dp"
+                    />
+                <Button
+                    android:id="@+id/btn_import_m3u_url"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:text="导入"
+                    android:minWidth="80dp"
+                    />
+            </LinearLayout>
+                
+            <EditText
+                android:id="@+id/edit_custom_m3u_url"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:text="导入M3U直播源"
+                android:hint="输入自定义M3U播放源URL"
+                android:inputType="textUri"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:padding="5dp"
+                android:background="#FF37474F"
+                android:textColor="#FFFFFF"
+                />
+                
+            <Button
+                android:id="@+id/btn_save_custom_m3u_url"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="保存自定义URL"
+                />
+                
+            <Button
+                android:id="@+id/btn_clear_custom_m3u_url"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="清除自定义URL"
                 />
                 
             <Button
@@ -99,10 +148,4 @@
                 android:text="管理自定义频道"
                 />
         </LinearLayout>
-        <ImageView
-            android:layout_width="300dp"
-            android:layout_height="wrap_content"
-            android:src="@drawable/appreciate"
-            android:background="@color/white" />
-    </LinearLayout>
 </FrameLayout>
